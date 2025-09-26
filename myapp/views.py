@@ -23,14 +23,18 @@ def student_list_create(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(['POST','GET', 'PUT', 'DELETE'])
 def student_detail(request, pk):
     try:
-        student = Student.objects.get(pk=pk, is_deleted=False)
+        student = Student.objects.get(pk=pk)
     except Student.DoesNotExist:
         return Response({'error': 'Student not found'}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
+        try:
+            course = Course.objects.get(pk=pk, is_delete=False)
+        except Course.DoesNotExist:
+            return Response({'error': 'Student not found'}, status=status.HTTP_404_NOT_FOUND)
         serializer = StudentSerializer(student)
         return Response(serializer.data)
 
@@ -44,6 +48,10 @@ def student_detail(request, pk):
     if request.method == 'DELETE':
         student.delete()
         return Response({"Message": "Student deleted"},status=status.HTTP_204_NO_CONTENT)
+    
+    if request.method == "POST":
+        student.restore()
+        return Response({"Message": "restored student"},status=status.HTTP_200_OK)
 
 @api_view(['GET', 'POST'])
 def course_list_create(request):
@@ -62,14 +70,18 @@ def course_list_create(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(["POST",'GET', 'PUT', 'DELETE'])
 def course_detail(request, pk):
     try:
-        course = Course.objects.get(pk=pk, is_deleted=False)
+        course = Course.objects.get(pk=pk)
     except Course.DoesNotExist:
         return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
+        try:
+            course = Course.objects.get(pk=pk, is_delete=False)
+        except Course.DoesNotExist:
+            return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
         serializer = CourseSerializer(course)
         return Response(serializer.data)
 
@@ -83,3 +95,7 @@ def course_detail(request, pk):
     if request.method == 'DELETE':
         course.delete()
         return Response({"Message": "Course deleted"},status=status.HTTP_204_NO_CONTENT)
+    
+    if request.method == "POST":
+        course.restore()
+        return Response({"Message": "restored course"},status=status.HTTP_200_OK)

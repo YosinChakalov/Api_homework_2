@@ -13,6 +13,10 @@ class Student(models.Model):
         self.full_name = self.full_name.capitalize()
         super().save(*args, **kwargs)
 
+    def restore(self, *args, **kwargs):
+        self.is_deleted = False
+        super().save(update_fields=['is_deleted'])
+
     def __str__(self):
         return self.full_name
 
@@ -28,6 +32,10 @@ class Course(models.Model):
     def save(self, *args, **kwargs):
         self.name = self.name.capitalize()
         super().save(*args, **kwargs)
+
+    def restore(self, *args, **kwargs):
+        self.is_deleted = False
+        super().save(update_fields=['is_deleted'])
 
     def __str__(self):
         return self.name
