@@ -11,7 +11,7 @@ def student_list_create(request):
     if request.method == 'GET':
         students = Student.objects.filter(is_deleted=False)
         students = search_filter(students, request.GET)
-        paginator = CustomPagination()
+        paginator = StudentPagination()
         paginated_students = paginator.paginate_queryset(students,request)
         serializer = StudentSerializer(paginated_students, many=True)
         return Response(serializer.data)
@@ -50,7 +50,9 @@ def course_list_create(request):
     if request.method == 'GET':
         courses = Course.objects.filter(is_deleted=False)
         courses = search_filter(courses, request.GET)
-        serializer = CourseSerializer(courses, many=True)
+        paginator = CoursePagination()
+        paginated_courses = paginator.paginate_queryset(courses,request)
+        serializer = CourseSerializer(paginated_courses, many=True)
         return Response(serializer.data)
 
     if request.method == 'POST':
